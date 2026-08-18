@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EcoAssist - AI Environmental Assistant</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🌱 EcoAssist</h1>
+
+        <p class="subtitle">
+            Your AI-powered environmental assistant
+        </p>
+
+        <p class="welcome">
+            Hello! 👋 I'm EcoAssist.
+            Ask me anything about recycling, water conservation,
+            energy saving, plastic waste, or sustainability.
+        </p>
+
+        <div class="input-area">
+
+            <input type="text" id="question" placeholder="Ask EcoAssist...">
+
+            <button id="sendBtn">
+                Send
+            </button>
+        </div>
+
+        <div id="response">
+        </div>
+
+        <footer>
+            EcoAssist ©️ 2026 | Building a greener future 🌍
+        </footer>
+
+    </div>
+
+    <script>
+
+        const questionInput =
+            document.getElementById("question");
+
+        const sendButton =
+            document.getElementById("sendBtn");
+
+        const responseBox =
+            document.getElementById("response");
+
+
+        async function askEcoAssist() {
+
+            const question =
+                questionInput.value.trim();
+
+
+            if (question === "") {
+
+                responseBox.style.display = "block";
+
+                responseBox.innerHTML =
+                    "⚠️ Please enter a question.";
+
+                return;
+            }
+
+
+            responseBox.style.display = "block";
+
+            responseBox.innerHTML =
+                "🌱 EcoAssist is thinking...";
+
+
+            try {
+
+                const response = await fetch(
+                    "http://127.0.0.1:8000/ask",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            question: question
+                        })
+                    }
+                );
+
+
+                if (!response.ok) {
+                    throw new Error("Server error");
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                responseBox.innerHTML +=
+                    "<p><strong>You:</strong> " +
+                    question +
+                    "</p>" +
+                    "<p><strong>EcoAssist:</strong> " +
+                    data.answer +
+                    "</p>";
+
+            } catch (error) {
+
+                console.error(error);
+
+                responseBox.innerHTML =
+                    "❌ Could not connect to the EcoAssist backend. " +
+                    "Please make sure the FastAPI server is running.";
+
+            }
+
+        }
+
+
+        sendButton.addEventListener(
+            "click",
+            askEcoAssist
+        );
+
+
+        questionInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+                    askEcoAssist();
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
